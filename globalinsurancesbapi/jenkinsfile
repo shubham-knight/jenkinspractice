@@ -1,0 +1,26 @@
+#!groovy
+pipeline{
+ agent any
+ 
+  tools {
+    maven 'maven'
+  }
+ 
+ stages{
+ 
+   stage("build"){
+   
+       steps{
+       
+          bat "cd globalinsurancesbapi & mvn  clean install -DskipTests"
+          bat "cd globalinsurancesbapi  & docker build -f dockerfile -t insappv1 . "
+                                   
+       }
+   
+   }
+ 
+ }
+ 
+ 
+ 
+}
