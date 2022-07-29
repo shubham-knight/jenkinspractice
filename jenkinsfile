@@ -11,11 +11,11 @@ pipeline{
 //   }
  try{
      stages{
-        stage('Code Clone from GIT'){
-            steps{
-                withCredentials()
-            }
-        }
+        //stage('Code Clone from GIT'){
+          //  steps{
+            //    withCredentials()
+            //}
+        //}
         stage('Compile and Clean'){
             steps{
                 bat "mvn -f pom.xml clean compile"
