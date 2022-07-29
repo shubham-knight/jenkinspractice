@@ -5,20 +5,82 @@ pipeline{
   tools {
     maven 'maven'
   }
- 
- stages{
- 
-   stage("build"){
-   
-       steps{
-       
-          bat "mvn  clean install -DskipTests"                                   
-       }
-   
-   }
- 
- }
- 
- 
- 
+//   environment{
+//     sonar_token=credentials("")
+//     dojo_sonar_url= 'URL'
+//   }
+ try{
+     stages{
+        stage('Code Clone from GIT'){
+            steps{
+                withCredentials()
+            }
+        }
+        stage('Compile and Clean'){
+            steps{
+                bat "mvn -f link clean compile"
+            }
+        }
+        
+        stage("Test"){
+            steps{
+               bat "mvn -f link test"
+            }
+
+        }
+
+        stage('Build'){
+            steps{
+                bat "mvn -f link package"
+            }
+
+        }
+
+        stage('Verify'){
+            steps{
+                bat "mvn -f link verify"
+            }
+        }
+
+        stage('Install'){
+            steps{
+                bat "mvn -f link install"
+            }
+        }
+
+        stage('SonarQube Report'){
+            steps{
+                bat  "mvn -f --yet to complete--"
+            }
+            post{
+                always{
+                    junit allowEmptyresults: true,testResults: '**/test-results/*.xml'
+                }
+                failure{
+                    echo "Pipeline Failed"
+                }
+            }
+        }
+
+        stage('Code Coverage Report'){
+
+        }
+
+//         stage('Build Docker'){
+//               sh './dockerBuild.sh'
+//         }
+//
+//         stage('Deployment on Kubernetes'){
+//
+//         }
+
+      }
+  }
+  catch(all) {
+         currentBuild.result = 'FAILURE'
+  }
+  finally {
+         step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+  }
+
 }
