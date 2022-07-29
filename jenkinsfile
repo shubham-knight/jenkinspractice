@@ -12,9 +12,7 @@ pipeline{
    
        steps{
        
-          bat "mvn  clean install -DskipTests"
-          bat "docker build -f dockerfile -t insappv1 . "
-                                   
+          bat "mvn  clean install -DskipTests"                                   
        }
    
    }
