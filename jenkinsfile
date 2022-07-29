@@ -9,6 +9,7 @@ pipeline{
 //     sonar_token=credentials("")
 //     dojo_sonar_url= 'URL'
 //   }
+script{
  try{
      stages{
         //stage('Code Clone from GIT'){
@@ -84,8 +85,10 @@ pipeline{
              }
          }
   }
-  finally {
-         step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-  }
+}
+  //finally {
+    //     step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
+  //}
 
 }
+
