@@ -18,39 +18,39 @@ pipeline{
         }
         stage('Compile and Clean'){
             steps{
-                bat "mvn -f link clean compile"
+                bat "mvn -f pom.xml clean compile"
             }
         }
         
         stage("Test"){
             steps{
-               bat "mvn -f link test"
+               bat "mvn -f pom.xml test"
             }
 
         }
 
         stage('Build'){
             steps{
-                bat "mvn -f link package"
+                bat "mvn -f pom.xml package"
             }
 
         }
 
         stage('Verify'){
             steps{
-                bat "mvn -f link verify"
+                bat "mvn -f pom.xml verify"
             }
         }
 
         stage('Install'){
             steps{
-                bat "mvn -f link install"
+                bat "mvn -f pom.xml install"
             }
         }
 
         stage('SonarQube Report'){
             steps{
-                bat  "mvn -f --yet to complete--"
+                bat  "mvn -f pom.xml"
             }
             post{
                 always{
@@ -66,18 +66,23 @@ pipeline{
 
         }
 
-//         stage('Build Docker'){
-//               sh './dockerBuild.sh'
-//         }
-//
+        stage('Build Docker'){
+              bat "docker build -f dockerfile -t insappv1 . "
+        }
+
 //         stage('Deployment on Kubernetes'){
-//
+// 
 //         }
 
       }
   }
   catch(all) {
          currentBuild.result = 'FAILURE'
+         post {
+             always {
+                     emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+             }
+         }
   }
   finally {
          step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
