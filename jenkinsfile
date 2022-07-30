@@ -63,9 +63,9 @@ script{
             }
         }
 
-        stage('Code Coverage Report'){
+//        stage('Code Coverage Report'){
 
-        }
+        //}
 
         stage('Build Docker'){
               bat "docker build -f dockerfile -t insappv1 . "
@@ -79,11 +79,11 @@ script{
   }
   catch(all) {
          currentBuild.result = 'FAILURE'
-         post {
-             always {
-                     emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
-             }
-         }
+         //post {
+           //  always {
+             //        emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
+            // }
+        // }
   }
 }
   //finally {
