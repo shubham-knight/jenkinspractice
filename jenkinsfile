@@ -86,7 +86,7 @@ stages{
         stage('SonarQube Report'){
             steps{
                 withSonarQubeEnv(installationName: 'SonarQube'){
-                    sh './mvnw clean sonar:sonar'
+                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
                 }
             }
 //             post{
