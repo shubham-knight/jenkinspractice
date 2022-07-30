@@ -6,17 +6,20 @@ pipeline{
     maven 'maven'
   }
 //   environment{
-//     sonar_token=credentials("")
-//     dojo_sonar_url= 'URL'
+//     sonar_token=credentials("sonar_token_product_phase")
+//     dojo_sonar_url= 'https://tools.publicis.sapient.com/sonar'
 //   }
 
 
 stages{
-        //stage('Code Clone from GIT'){
-          //  steps{
-            //    withCredentials()
-            //}
-        //}
+//         stage('Prepare Code Cloning from GIT'){
+//             steps{
+//                 withCredentials([string(credentialsId: 'git_token_shinamde'),variable:'git_token']){
+//                     git branch: 'sonar-test',
+//                     url:
+//                 }
+//             }
+//         }
 
         stage('Compile and Clean'){
             steps{
@@ -44,7 +47,7 @@ stages{
                     }
                 }
 
-        stage('Build'){
+        stage('Maven Build'){
                     steps{
                         script{
                                try{
@@ -86,8 +89,9 @@ stages{
         stage('SonarQube Report'){
             steps{
                 withSonarQubeEnv(installationName: 'SonarQube'){
-                    sh './mvnw clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.7.0.1746:sonar'
+                    bat './mvnw clean sonar:sonar'
                 }
+//                 "mvn -f server/product-sonar/pom.xml sonar:sonar -Dsonar.projectName=  -Dsonar.projectKey= -Dsonar.host.url= -Dsonar.login="
             }
 //             post{
 //                 always{
@@ -99,32 +103,8 @@ stages{
 //             }
         }
 
-//        stage('Code Coverage Report'){
-
-        //}
-
-//         stage('Build Docker'){
-//               bat "docker build -f dockerfile -t insappv1 . "
-//         }
-
-//         stage('Deployment on Kubernetes'){
-// 
-//         }
-
-
   }
-//   catch(all) {
-//          currentBuild.result = 'FAILURE'
-//          //post {
-//            //  always {
-//              //        emailext body: 'A Test EMail', recipientProviders: [[$class: 'DevelopersRecipientProvider'], [$class: 'RequesterRecipientProvider']], subject: 'Test'
-//             // }
-//         // }
-//   }
 
-  //finally {
-    //     step $class: 'JUnitResultArchiver', testResults: '**/TEST-*.xml'
-  //}
 
 }
 
