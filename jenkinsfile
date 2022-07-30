@@ -89,7 +89,7 @@ stages{
             }
             post{
                 always{
-                    junit allowEmptyresults: true,testResults: '**/test-results/*.xml'
+                    junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
                 }
                 failure{
                     echo "Pipeline Failed"
