@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MovieImpl.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">q1</a> &gt; <a href="index.source.html" class="el_package">org.sapient.dao</a> &gt; <span class="el_source">MovieImpl.java</span></div><h1>MovieImpl.java</h1><pre class="source lang-java linenums">package org.sapient.dao;
+
+import com.google.gson.Gson;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.Indexes;
+import org.bson.Document;
+import org.sapient.facades.MovieFacade;
+import org.sapient.helpers.MongoDBHelper;
+import org.sapient.models.Movie;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.ResourceBundle;
+
+import static com.mongodb.client.model.Filters.eq;
+
+public class MovieImpl implements MovieFacade{
+    private MongoClient mongoClient;
+    private MongoCollection mongoCollection;
+    private ResourceBundle resourceBundle;
+    private boolean status;
+    private Gson gson;
+
+<span class="fc" id="L26">    public MovieImpl() {</span>
+<span class="fc" id="L27">        resourceBundle=ResourceBundle.getBundle(&quot;db&quot;);</span>
+<span class="fc" id="L28">        mongoClient= MongoDBHelper.getConnection();</span>
+<span class="fc" id="L29">        var database= mongoClient</span>
+<span class="fc" id="L30">                .getDatabase(resourceBundle.getString(&quot;dbname&quot;));</span>
+<span class="fc" id="L31">        var collectionName=resourceBundle.getString(&quot;collectionName&quot;);</span>
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">        if(database.getCollection(collectionName)==null) {</span>
+<span class="nc" id="L33">            database.createCollection(collectionName);</span>
+        }
+<span class="fc" id="L35">        mongoCollection= database.getCollection(collectionName);</span>
+<span class="fc" id="L36">        mongoCollection.createIndex(Indexes.ascending(&quot;movieCode&quot;,&quot;movieCode&quot;));</span>
+<span class="fc" id="L37">        gson=new Gson();</span>
+<span class="fc" id="L38">    }</span>
+
+    @Override
+    public boolean addMovie(Movie movie) {
+<span class="fc" id="L42">        Document document= Document.parse(gson.toJson(movie));</span>
+<span class="fc" id="L43">        mongoCollection.insertOne(document);</span>
+<span class="fc" id="L44">        status=true;</span>
+<span class="fc" id="L45">        return status;</span>
+    }
+
+    @Override
+    public boolean updateMovie(String movieCode, String movieName) {
+<span class="fc" id="L50">        mongoCollection.updateOne(new Document(&quot;movieCode&quot;,movieCode),</span>
+                new Document(&quot;$set&quot;,new Document(&quot;movieName&quot;,movieName)));
+<span class="fc" id="L52">        status=true;</span>
+<span class="fc" id="L53">        return status;</span>
+    }
+
+    @Override
+    public List&lt;Object&gt; getAllMovies() {
+<span class="nc" id="L58">        ArrayList&lt;Object&gt; movies=new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L59">        try(MongoCursor&lt;Document&gt; cursor= mongoCollection.find()</span>
+<span class="nc" id="L60">                .sort(new Document(&quot;movieCode&quot;,1)).limit(1)</span>
+<span class="nc" id="L61">                .iterator()){</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            while(cursor.hasNext()){</span>
+<span class="nc" id="L63">                var doc=cursor.next();</span>
+<span class="nc" id="L64">                movies.add(doc.values());</span>
+<span class="nc" id="L65">            }</span>
+        }
+<span class="nc" id="L67">        return movies;</span>
+    }
+
+    @Override
+    public boolean deleteMovieByCode(String movieCode) {
+<span class="fc" id="L72">        mongoCollection.deleteOne(eq(&quot;movieCode&quot;,movieCode));</span>
+<span class="fc" id="L73">        status=true;</span>
+<span class="fc" id="L74">        return status;    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
