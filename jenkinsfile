@@ -89,14 +89,14 @@ stages{
                     sh './mvnw clean sonar:sonar'
                 }
             }
-            post{
-                always{
-                    junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
-                }
-                failure{
-                    echo "Pipeline Failed"
-                }
-            }
+//             post{
+//                 always{
+//                     junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
+//                 }
+//                 failure{
+//                     echo "Pipeline Failed"
+//                 }
+//             }
         }
 
 //        stage('Code Coverage Report'){
