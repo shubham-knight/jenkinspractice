@@ -4,7 +4,7 @@ pipeline{
  
   tools {
     maven 'maven'
-    
+
   }
 //   environment{
 //     sonar_token=credentials("sonar_token_product_phase")
@@ -104,7 +104,9 @@ stages{
 //             }
         }
         stage('Build Docker'){
-              bat "docker build -f dockerfile -t insappv1 . "
+            steps{
+                bat "docker build -f dockerfile -t insappv1 . "
+            }
         }
 
 //         stage('Deployment on Kubernetes'){
