@@ -85,7 +85,9 @@ stages{
 
         stage('SonarQube Report'){
             steps{
-                bat  "mvn -f pom.xml"
+                withSonarQubeEnv(installationName: 'SonarQube'){
+                    sh './mvnw clean sonar:sonar'
+                }
             }
             post{
                 always{
