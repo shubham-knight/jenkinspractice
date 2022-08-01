@@ -1,26 +1,23 @@
 #!groovy
 pipeline{
  agent any
- 
+
+
+//Defining tools needed in Pipeline
   tools {
     maven 'maven'
 
   }
+
+//Setting up environment for SonarQube- To be used when PS SonarQube is used
 //   environment{
 //     sonar_token=credentials("sonar_token_product_phase")
 //     dojo_sonar_url= 'https://tools.publicis.sapient.com/sonar'
 //   }
 
 
+//Stages start here
 stages{
-//         stage('Prepare Code Cloning from GIT'){
-//             steps{
-//                 withCredentials([string(credentialsId: 'git_token_shinamde'),variable:'git_token']){
-//                     git branch: 'sonar-test',
-//                     url:
-//                 }
-//             }
-//         }
 
         stage('Compile and Clean'){
             steps{
@@ -36,17 +33,17 @@ stages{
         }
 
         stage('Test'){
-                    steps{
-                        script{
-                               try{
-                                    bat " mvn -f pom.xml test"
-                               }
-                               catch(all){
-                                    echo "Test stage Failed"
-                               }
-                        }
-                    }
-                }
+              steps{
+                  script{
+                         try{
+                              bat " mvn -f pom.xml test"
+                         }
+                         catch(all){
+                              echo "Test stage Failed"
+                         }
+                  }
+             }
+        }
 
         stage('Maven Build'){
             steps{
@@ -102,14 +99,14 @@ stages{
                 }
 //                 "mvn -f server/product-sonar/pom.xml sonar:sonar -Dsonar.projectName=  -Dsonar.projectKey= -Dsonar.host.url= -Dsonar.login="
             }
-//             post{
-//                 always{
-//                     junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
-//                 }
-//                 failure{
-//                     echo "Pipeline Failed"
-//                 }
-//             }
+            post{
+                always{
+                    junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
+                }
+                failure{
+                    echo "Pipeline Failed"
+                }
+            }
         }
 
 //         stage('Build Docker'){
