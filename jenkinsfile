@@ -49,17 +49,18 @@ stages{
                 }
 
         stage('Maven Build'){
-                    steps{
-                        script{
-                               try{
-                                    bat "mvn -f pom.xml package"
-                               }
-                               catch(all){
-                                    echo "Build stage Failed. War file not created"
-                               }
-                        }
-                    }
+            steps{
+                script{
+                       try{
+                            bat "mvn -f pom.xml package"
+                       }
+                       catch(all){
+                            echo "Build stage Failed. War file not created"
+                       }
                 }
+            }
+        }
+
         stage('Verify'){
             steps{
                 script{
@@ -86,6 +87,10 @@ stages{
             }
         }
 
+        stage("Test and Jacoco Static analysis"){
+            junit 'target/surefire-reports/**/*.xml'
+            jacoco()
+        }
 
         stage('SonarQube Report'){
             steps{
@@ -103,14 +108,32 @@ stages{
 //                 }
 //             }
         }
-        stage('Build Docker'){
-            steps{
-                bat "docker build -f dockerfile -t insappv1 . "
-            }
-        }
 
-//         stage('Deployment on Kubernetes'){
+//         stage('Build Docker'){
+//             steps{
+//                 script{
+//                      bat "docker build -f dockerfile -t prodDevMicroService . "
+//                 }
+//             }
+//         }
 //
+//         stage('Push Docker image'){
+//             steps{
+//                 script {
+//                     docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+//                            myapp.push("latest")
+//                            myapp.push("${env.BUILD_ID}")
+//                        }
+//                 }
+//             }
+//         }
+//
+//         stage('Deployment on Kubernetes'){
+//             steps{
+//                 scripts{
+//                     kubernetesDeploy(configs: "", kubeconfigId: "mykubeConfig")
+//                 }
+//             }
 //         }
 
   }
