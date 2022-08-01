@@ -88,8 +88,11 @@ stages{
         }
 
         stage("Test and Jacoco Static analysis"){
-            junit 'target/surefire-reports/**/*.xml'
-            jacoco()
+            steps{
+                junit 'target/surefire-reports/**/*.xml'
+                jacoco()
+            }
+
         }
 
         stage('SonarQube Report'){
