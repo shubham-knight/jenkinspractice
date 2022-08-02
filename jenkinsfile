@@ -26,7 +26,15 @@ stages{
                             bat "mvn -f pom.xml clean compile"
                        }
                        catch(all){
-                            echo "Compile and clean stage Failed"
+                            echo "Install stage Failed"
+                                                        echo 'Publishing SNS message to AWS'
+                                                        withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                              snsPublish(
+                                                                    topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                                    subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                                    message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                              )
+                                                        }
                        }
                 }
             }
@@ -39,7 +47,15 @@ stages{
                               bat " mvn -f pom.xml test"
                          }
                          catch(all){
-                              echo "Test stage Failed"
+                              echo "Install stage Failed"
+                                                          echo 'Publishing SNS message to AWS'
+                                                          withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                                snsPublish(
+                                                                      topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                                      subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                                      message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                                )
+                                                          }
                          }
                   }
              }
@@ -52,7 +68,15 @@ stages{
                             bat "mvn -f pom.xml package"
                        }
                        catch(all){
-                            echo "Build stage Failed. War file not created"
+                            echo "Install stage Failed"
+                                                        echo 'Publishing SNS message to AWS'
+                                                        withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                              snsPublish(
+                                                                    topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                                    subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                                    message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                              )
+                                                        }
                        }
                 }
             }
@@ -65,11 +89,20 @@ stages{
                             bat "mvn -f pom.xml verify"
                        }
                        catch(all){
-                            echo "Verify stage Failed"
+                            echo "Install stage Failed"
+                                                        echo 'Publishing SNS message to AWS'
+                                                        withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                              snsPublish(
+                                                                    topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                                    subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                                    message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                              )
+                                                        }
                        }
                 }
             }
         }
+
 
         stage('Install'){
             steps{
@@ -79,6 +112,14 @@ stages{
                        }
                        catch(all){
                             echo "Install stage Failed"
+                            echo 'Publishing SNS message to AWS'
+                            withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                  snsPublish(
+                                        topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                        subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                        message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                  )
+                            }
                        }
                 }
             }
@@ -86,14 +127,32 @@ stages{
 
         stage("Test and Jacoco Static analysis"){
             steps{
-                junit 'target/surefire-reports/**/*.xml'
-                jacoco()
+                script{
+                try{
+                                           junit 'target/surefire-reports/**/*.xml'
+                                           jacoco()
+                                       }
+                                       catch(all){
+                                           echo "Install stage Failed"
+                                                                       echo 'Publishing SNS message to AWS'
+                                                                       withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                                             snsPublish(
+                                                                                   topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                                                   subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                                                   message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                                             )
+                                                                       }
+                                       }
+                }
+
+
             }
 
         }
 
         stage('SonarQube Report'){
             steps{
+
                 withSonarQubeEnv(installationName: 'SonarQube'){
                     bat './mvnw clean sonar:sonar'
                 }
@@ -104,7 +163,15 @@ stages{
                     junit allowEmptyResults: true,testResults: '**/test-results/*.xml'
                 }
                 failure{
-                    echo "Pipeline Failed"
+                    echo "Install stage Failed"
+                                                echo 'Publishing SNS message to AWS'
+                                                withAWS(credentials:'45472be1-a363-45a4-97a3-a65abf4f1bc4') {
+                                                      snsPublish(
+                                                            topicArn:'arn:aws:sns:us-west-2:yourAccountId:aws_resource_status_toggle',
+                                                            subject:"${params.ACTION} ${params.AWS_ENVIRONMENT}",
+                                                            message: getMessage(mapEnvironmentToAWS[params.AWS_ENVIRONMENT], params.ACTION )
+                                                      )
+                                                }
                 }
             }
         }
